@@ -13,16 +13,6 @@ if [ "$(id -u)" != "0" ]; then
   exec sudo "$0" "$@"
 fi
 
-if [ "$(id -u)" != "0" ]; then
-	echo "Sorry, you are not root."
-	exit 1
-fi
-
-if [ -z "$1" ]; then
-	echo -e "No Parameters provided.\nUsage: list, restore, destroy, destroy-all, destroy-badroot"
-	exit 1
-fi
-
 if [ $1 = "list" ]; then
 	if [ $(btrfs subvolume list / | grep apt | awk '{print $9}' | wc -l) = 0 ]; then
 		echo "No snapshots found."
@@ -30,9 +20,7 @@ if [ $1 = "list" ]; then
 		echo -e "==APT Snapshots =="
   	btrfs subvolume list / | grep apt | awk '{print $9}'
 	fi
-fi
-
-if [ $1 = "destroy" ]; then
+elif [ $1 = "destroy" ]; then
 	if [ $(sudo btrfs subvolume list / | grep apt | wc -l) != 1 ]; then
 		echo -e "There is more than one snapshot - please manually remove snapshots, or rerun with destroy-all"
 		exit 1
@@ -47,9 +35,7 @@ if [ $1 = "destroy" ]; then
 		cd $print_working_dir
 		sudo umount /mnt
 	fi
-fi
-
-if [ $1 = "destroy-all" ]; then
+elif [ $1 = "destroy-all" ]; then
 	mount $root_disk /mnt
 	apt_snapshot=$(sudo btrfs subvolume list / | grep apt | awk '{print $9}')
 	print_working_dir=$(pwd)
@@ -58,9 +44,7 @@ if [ $1 = "destroy-all" ]; then
 	echo "All Apt Snapshots deleted"
 	cd $print_working_dir
 	sudo umount /mnt
-fi
-
-if [ $1 = "restore" ]; then
+elif [ $1 = "restore" ]; then
 	if [ $(sudo btrfs subvolume list / | grep apt | wc -l) != 1 ]; then
 		echo -e "There is more than one snapshot - please manually remove excess snapshots"
 		exit 1
@@ -75,9 +59,7 @@ if [ $1 = "restore" ]; then
 		sudo umount /mnt
 		echo "System restore has been successfully completed. Please reboot to apply the restored filesystem. If everything looks good, run \"snaptshot destroy-badroot option\""
 	fi
-fi
-
-if [ $1 = "destroy-badroot" ]; then
+elif [ $1 = "destroy-badroot" ]; then
 	mount $root_disk /mnt
 	apt_snapshot=$(sudo btrfs subvolume list / | grep badroot | awk '{print $9}')
 	print_working_dir=$(pwd)
@@ -85,4 +67,7 @@ if [ $1 = "destroy-badroot" ]; then
 	echo $apt_snapshot | xargs btrfs subvolume delete
 	cd $print_working_dir
 	sudo umount /mnt
+else [ -z "$1" ]; then
+	echo -e "No Parameters provided.\nUsage: list, restore, destroy, destroy-all, destroy-badroot"
+	exit 1
 fi
