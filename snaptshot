@@ -67,7 +67,7 @@ elif [ $1 = "destroy-badroot" ]; then
 	echo $apt_snapshot | xargs btrfs subvolume delete
 	cd $print_working_dir
 	sudo umount /mnt
-else [ -z "$1" ]; then
+else [ -z "$1" ]; 
 	echo -e "No Parameters provided.\nUsage: list, restore, destroy, destroy-all, destroy-badroot"
 	exit 1
 fi
