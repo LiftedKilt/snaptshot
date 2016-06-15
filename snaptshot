@@ -33,7 +33,7 @@ elif [ $1 = "destroy" ]; then
 		print_working_dir=$(pwd)
 		cd /mnt
 		echo "deleting $apt_snapshot"
-		btrfs subvolume delete $apt_snapshot
+		sudo btrfs subvolume delete $apt_snapshot
 		echo "$apt_snapshot deleted"
 		cd $print_working_dir
 		sudo umount /mnt
@@ -43,7 +43,7 @@ elif [ $1 = "destroy-all" ]; then
 	apt_snapshot=$(sudo btrfs subvolume list / | grep apt | awk '{print $9}')
 	print_working_dir=$(pwd)
 	cd /mnt
-	echo $apt_snapshot | xargs btrfs subvolume delete
+	echo $apt_snapshot | xargs sudo btrfs subvolume delete
 	echo "All Apt Snapshots deleted"
 	cd $print_working_dir
 	sudo umount /mnt
@@ -67,7 +67,7 @@ elif [ $1 = "destroy-badroot" ]; then
 	apt_snapshot=$(sudo btrfs subvolume list / | grep badroot | awk '{print $9}')
 	print_working_dir=$(pwd)
 	cd /mnt
-	echo $apt_snapshot | xargs btrfs subvolume delete
+	echo $apt_snapshot | xargs sudo btrfs subvolume delete
 	cd $print_working_dir
 	sudo umount /mnt
 fi
